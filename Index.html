@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Cahill Tobacco Shift Relay</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans pb-20">
+
+  <!-- TOP APP BAR -->
+  <header class="bg-slate-900 border-b border-slate-800 px-4 py-3 sticky top-0 z-50 flex items-center justify-between">
+    <div>
+      <h1 class="font-bold text-lg text-amber-500 flex items-center gap-2">
+        <i data-lucide="repeat" class="w-5 h-5"></i> ShiftRelay
+      </h1>
+      <p class="text-xs text-slate-400">Cahill Tobacco Network</p>
+    </div>
+    <span class="text-xs bg-emerald-950 text-emerald-400 border border-emerald-800 px-2.5 py-1 rounded-full font-medium">4 Locations Live</span>
+  </header>
+
+  <!-- MAIN APP CONTAINER -->
+  <main class="flex-1 p-4 max-w-md mx-auto w-full space-y-4">
+
+    <!-- LOCATION SELECTOR -->
+    <div class="bg-slate-900 border border-slate-800 rounded-xl p-3">
+      <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1">Filter by Store</label>
+      <select id="locationFilter" onchange="loadShifts()" class="w-full bg-slate-950 border border-slate-700 text-sm rounded-lg p-2 text-slate-200 focus:ring-1 focus:ring-amber-500">
+        <option value="ALL">All 4 Stores (Within Radius)</option>
+      </select>
+    </div>
+
+    <!-- TABS -->
+    <div class="flex bg-slate-900 p-1 rounded-xl border border-slate-800">
+      <button onclick="switchTab('open')" id="tab-open" class="flex-1 py-2 text-xs font-semibold rounded-lg bg-amber-500 text-slate-950 transition">Open Shifts</button>
+      <button onclick="switchTab('post')" id="tab-post" class="flex-1 py-2 text-xs font-semibold rounded-lg text-slate-400 transition">Post Shift</button>
+      <button onclick="switchTab('stores')" id="tab-stores" class="flex-1 py-2 text-xs font-semibold rounded-lg text-slate-400 transition">Stores</button>
+    </div>
+
+    <!-- VIEW 1: OPEN SHIFTS FEED -->
+    <section id="view-open" class="space-y-3">
+      <div id="shiftsList" class="space-y-3">
+        <div class="text-center py-8 text-slate-500 text-sm">Loading available shifts...</div>
+      </div>
+    </section>
+
+    <!-- VIEW 2: POST / DROP SHIFT FORM -->
+    <section id="view-post" class="hidden space-y-3 bg-slate-900 p-4 rounded-xl border border-slate-800">
+      <h2 class="font-semibold text-sm text-slate-200">Broadcast an Unwanted Shift</h2>
+      
+      <div class="space-y-3">
+        <div>
+          <label class="text-xs text-slate-400">Store Location</label>
+          <select id="postLocation" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-sm text-slate-200 mt-1"></select>
+        </div>
+        <div>
+          <label class="text-xs text-slate-400">Date</label>
+          <input type="date" id="postDate" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-sm text-slate-200 mt-1" />
+        </div>
+        <div>
+          <label class="text-xs text-slate-400">Shift Block (6 Hours)</label>
+          <select id="postBlock" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-sm text-slate-200 mt-1">
+            <option value="AM">Morning (9:00 AM - 3:00 PM)</option>
+            <option value="MID">Mid-Day (12:00 PM - 6:00 PM)</option>
+            <option value="PM">Evening (3:00 PM - 9:00 PM)</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-xs text-slate-400">Notes / Register Handover Notice</label>
+          <textarea id="postNotes" rows="2" placeholder="e.g. Closing duties included" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-sm text-slate-200 mt-1"></textarea>
+        </div>
+        <button onclick="postShift()" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-2.5 rounded-lg text-sm transition">
+          Broadcast to Available Staff
+        </button>
+      </div>
+    </section>
+
+    <!-- VIEW 3: STORE LOCATIONS DIRECTORY -->
+    <section id="view-stores" class="hidden space-y-2" id="storeDirectory">
+      <div id="storeList" class="space-y-2"></div>
+    </section>
+
+  </main>
+
+  <script>
+    // 1. SUPABASE CLIENT CONFIG (Replace with your actual keys)
+    const SUPABASE_URL = "https://kwriljaflulqytkdfnkx.supabase.co/rest/v1/
+";
+    const SUPABASE_ANON_KEY = "sb_publishable_5tSC2mhg8UAWHQXXStgQdg_PcJtJn4A
+";
+    const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let locations = [];
+
+    async function init() {
+      lucide.createIcons();
+      await fetchLocations();
+      await loadShifts();
+    }
+
+    async function fetchLocations() {
+      const { data, error } = await client.from('locations').select('*');
+      if (data) {
+        locations = data;
+        const filterEl = document.getElementById('locationFilter');
+        const postEl = document.getElementById('postLocation');
+        const listEl = document.getElementById('storeList');
+
+        filterEl.innerHTML = '<option value="ALL">All 4 Stores (Within Radius)</option>';
+        postEl.innerHTML = '';
+        listEl.innerHTML = '';
+
+        locations.forEach(loc => {
+          filterEl.innerHTML += `<option value="${loc.id}">${loc.name}</option>`;
+          postEl.innerHTML += `<option value="${loc.id}">${loc.name}</option>`;
+          listEl.innerHTML += `
+            <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl">
+              <div class="font-bold text-sm text-slate-200">${loc.name}</div>
+              <div class="text-xs text-slate-400">${loc.address}</div>
+              <div class="text-[11px] text-amber-500 mt-1 font-mono">${loc.store_number}</div>
+            </div>`;
+        });
+      }
+    }
+
+    async function loadShifts() {
+      const filterId = document.getElementById('locationFilter').value;
+      let query = client.from('shifts').select('*, locations(name, address)').eq('status', 'open_broadcast');
+      
+      if (filterId !== 'ALL') {
+        query = query.eq('location_id', filterId);
+      }
+
+      const { data: shifts, error } = await query;
+      const listEl = document.getElementById('shiftsList');
+
+      if (!shifts || shifts.length === 0) {
+        listEl.innerHTML = `
+          <div class="bg-slate-900/50 border border-slate-800 rounded-xl p-6 text-center text-slate-400 text-sm">
+            <i data-lucide="check-circle-2" class="w-8 h-8 text-emerald-500 mx-auto mb-2"></i>
+            All shifts currently covered! Check back soon.
+          </div>`;
+        lucide.createIcons();
+        return;
+      }
+
+      listEl.innerHTML = shifts.map(s => `
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-3">
+          <div class="flex justify-between items-start">
+            <div>
+              <span class="text-xs font-bold text-amber-400 bg-amber-950/60 border border-amber-800/60 px-2 py-0.5 rounded">${s.shift_type} SHIFT (6 HRS)</span>
+              <h3 class="font-bold text-slate-100 text-sm mt-1.5">${s.locations?.name || 'Store'}</h3>
+              <p class="text-xs text-slate-400">${s.locations?.address || ''}</p>
+            </div>
+            <div class="text-right">
+              <span class="text-xs font-mono text-slate-300 block">${s.shift_date}</span>
+            </div>
+          </div>
+          ${s.notes ? `<p class="text-xs bg-slate-950 p-2 rounded text-slate-300 border border-slate-800">"${s.notes}"</p>` : ''}
+          <button onclick="claimShift('${s.id}')" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2 rounded-lg text-xs transition">
+            Claim This Shift (Manager Review)
+          </button>
+        </div>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    async function postShift() {
+      const locId = document.getElementById('postLocation').value;
+      const date = document.getElementById('postDate').value;
+      const block = document.getElementById('postBlock').value;
+      const notes = document.getElementById('postNotes').value;
+
+      if (!date) return alert('Please pick a shift date');
+
+      const startHour = block === 'AM' ? 9 : (block === 'MID' ? 12 : 15);
+      const endHour = startHour + 6;
+
+      const { error } = await client.from('shifts').insert([{
+        location_id: locId,
+        shift_date: date,
+        start_time: `${date}T${startHour}:00:00Z`,
+        end_time: `${date}T${endHour}:00:00Z`,
+        shift_type: block,
+        status: 'open_broadcast',
+        notes: notes
+      }]);
+
+      if (error) {
+        alert('Error posting shift: ' + error.message);
+      } else {
+        alert('Shift posted successfully!');
+        switchTab('open');
+        loadShifts();
+      }
+    }
+
+    async function claimShift(shiftId) {
+      const { error } = await client.from('shifts').update({ status: 'swap_pending' }).eq('id', shiftId);
+      if (error) {
+        alert(error.message);
+      } else {
+        alert('Shift claim submitted for Manager Approval!');
+        loadShifts();
+      }
+    }
+
+    function switchTab(tab) {
+      ['open', 'post', 'stores'].forEach(t => {
+        document.getElementById(`view-${t}`).classList.add('hidden');
+        document.getElementById(`tab-${t}`).className = 'flex-1 py-2 text-xs font-semibold rounded-lg text-slate-400 transition';
+      });
+      document.getElementById(`view-${tab}`).classList.remove('hidden');
+      document.getElementById(`tab-${tab}`).className = 'flex-1 py-2 text-xs font-semibold rounded-lg bg-amber-500 text-slate-950 transition';
+    }
+
+    init();
+  </script>
+</body>
+</html>
