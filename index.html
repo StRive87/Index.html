@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Wreklyn Shift | Where Chaos Gets Corrected</title>
   
-  <!-- App Icons for Android Home Screen -->
   <link rel="icon" type="image/png" href="./logo.png" />
   <link rel="apple-touch-icon" href="./logo.png" />
   <meta name="theme-color" content="#030712" />
@@ -16,10 +15,9 @@
 </head>
 <body class="bg-gray-950 text-slate-100 min-h-screen flex flex-col font-sans pb-24 selection:bg-emerald-500 selection:text-black">
 
-  <!-- TOP WREKLYN HEADER -->
+  <!-- TOP BRAND HEADER -->
   <header class="bg-gray-900/90 backdrop-blur-md border-b border-emerald-950/80 px-4 py-3 sticky top-0 z-50 flex items-center justify-between shadow-lg">
     <div class="flex items-center gap-3">
-      <!-- Logo Image with Fallback Monogram -->
       <img src="./logo.png" onerror="this.onerror=null; this.src='https://placehold.co/80x80/042f2e/10b981?text=WS';" alt="Wreklyn Logo" class="w-10 h-10 rounded-xl object-contain bg-black border border-emerald-500/30 p-0.5 shadow-md shadow-emerald-950/50" />
       <div>
         <h1 class="font-black text-base tracking-tight text-white leading-none">
@@ -28,66 +26,53 @@
         <p class="text-[10px] text-emerald-500/90 font-medium tracking-wide italic mt-0.5">Where chaos gets corrected</p>
       </div>
     </div>
-    <span class="text-[11px] bg-emerald-950/80 text-emerald-400 border border-emerald-800/80 px-2.5 py-1 rounded-full font-mono font-semibold">
-      4 Stores Live
+    <span id="networkBadge" class="text-[11px] bg-emerald-950/80 text-emerald-400 border border-emerald-800/80 px-2.5 py-1 rounded-full font-mono font-semibold">
+      3 Stores Live
     </span>
   </header>
 
   <!-- MAIN APP CONTAINER -->
   <main class="flex-1 p-4 max-w-md mx-auto w-full space-y-4">
 
-    <!-- HERO BRAND CARD -->
-    <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-950/50 via-gray-900 to-black border border-emerald-500/20 p-4 shadow-xl">
-      <div class="relative z-10 space-y-1">
-        <span class="text-[10px] font-bold uppercase tracking-widest text-emerald-400 bg-emerald-950 border border-emerald-800/80 px-2 py-0.5 rounded">
-          Cahill Tobacco Network
-        </span>
-        <h2 class="text-lg font-black text-white pt-1">Cross-Store Coverage Dispatch</h2>
-        <p class="text-xs text-gray-300">Drop unwanted shifts or pick up hours across sister locations.</p>
-      </div>
-      <i data-lucide="layers" class="w-24 h-24 absolute -right-4 -bottom-4 text-emerald-500/5 rotate-12 pointer-events-none"></i>
-    </div>
-
     <!-- STORE FILTER -->
     <div class="bg-gray-900 border border-gray-800 rounded-xl p-3 shadow-sm">
-      <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Filter by Store Location</label>
+      <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Store Filter</label>
       <select id="locationFilter" onchange="loadShifts()" class="w-full bg-black border border-gray-700 text-sm rounded-lg p-2.5 text-gray-200 focus:outline-none focus:border-emerald-500">
-        <option value="ALL">All 4 Locations (Within Travel Radius)</option>
+        <option value="ALL">All Network Locations</option>
       </select>
     </div>
 
-    <!-- NAVIGATION TABS -->
+    <!-- TABS -->
     <div class="flex bg-gray-900 p-1 rounded-xl border border-gray-800">
       <button onclick="switchTab('open')" id="tab-open" class="flex-1 py-2 text-xs font-bold rounded-lg bg-emerald-500 text-black transition shadow-sm">Open Board</button>
-      <button onclick="switchTab('post')" id="tab-post" class="flex-1 py-2 text-xs font-bold rounded-lg text-gray-400 transition">Broadcast Shift</button>
-      <button onclick="switchTab('stores')" id="tab-stores" class="flex-1 py-2 text-xs font-bold rounded-lg text-gray-400 transition">Locations</button>
+      <button onclick="switchTab('post')" id="tab-post" class="flex-1 py-2 text-xs font-bold rounded-lg text-gray-400 transition">Broadcast</button>
+      <button onclick="switchTab('stores')" id="tab-stores" class="flex-1 py-2 text-xs font-bold rounded-lg text-gray-400 transition">Stores</button>
     </div>
 
-    <!-- VIEW 1: OPEN SHIFTS FEED -->
+    <!-- VIEW 1: OPEN SHIFTS -->
     <section id="view-open" class="space-y-3">
       <div id="shiftsList" class="space-y-3">
         <div class="text-center py-8 text-gray-500 text-sm">Loading available shifts...</div>
       </div>
     </section>
 
-    <!-- VIEW 2: BROADCAST / POST SHIFT FORM -->
+    <!-- VIEW 2: BROADCAST SHIFT -->
     <section id="view-post" class="hidden space-y-3 bg-gray-900 p-4 rounded-xl border border-gray-800">
       <div class="border-b border-gray-800 pb-2">
         <h2 class="font-bold text-sm text-white">Broadcast Unwanted Shift</h2>
-        <p class="text-xs text-gray-400">Pushes an alert to off-duty qualified coworkers.</p>
+        <p class="text-xs text-gray-400">Pushes coverage alert to available staff.</p>
       </div>
-      
       <div class="space-y-3 pt-1">
         <div>
-          <label class="text-xs font-medium text-gray-300">Select Store</label>
+          <label class="text-xs font-medium text-gray-300">Store</label>
           <select id="postLocation" class="w-full bg-black border border-gray-700 rounded-lg p-2.5 text-sm text-gray-200 mt-1 focus:border-emerald-500"></select>
         </div>
         <div>
-          <label class="text-xs font-medium text-gray-300">Shift Date</label>
+          <label class="text-xs font-medium text-gray-300">Date</label>
           <input type="date" id="postDate" class="w-full bg-black border border-gray-700 rounded-lg p-2.5 text-sm text-gray-200 mt-1 focus:border-emerald-500" />
         </div>
         <div>
-          <label class="text-xs font-medium text-gray-300">Shift Block (6 Hours)</label>
+          <label class="text-xs font-medium text-gray-300">Shift Block</label>
           <select id="postBlock" class="w-full bg-black border border-gray-700 rounded-lg p-2.5 text-sm text-gray-200 mt-1 focus:border-emerald-500">
             <option value="AM">Morning (9:00 AM - 3:00 PM)</option>
             <option value="MID">Mid-Day (12:00 PM - 6:00 PM)</option>
@@ -95,8 +80,8 @@
           </select>
         </div>
         <div>
-          <label class="text-xs font-medium text-gray-300">Handover Notes / Store Duties</label>
-          <textarea id="postNotes" rows="2" placeholder="e.g., Register closing, stocking delivery, keyholder required..." class="w-full bg-black border border-gray-700 rounded-lg p-2.5 text-sm text-gray-200 mt-1 focus:border-emerald-500"></textarea>
+          <label class="text-xs font-medium text-gray-300">Notes / Duties</label>
+          <textarea id="postNotes" rows="2" placeholder="e.g. Closing register, stock delivery..." class="w-full bg-black border border-gray-700 rounded-lg p-2.5 text-sm text-gray-200 mt-1 focus:border-emerald-500"></textarea>
         </div>
         <button onclick="postShift()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-black py-3 rounded-xl text-sm transition shadow-lg shadow-emerald-950">
           Post Shift to Network
@@ -104,9 +89,22 @@
       </div>
     </section>
 
-    <!-- VIEW 3: STORE LOCATIONS DIRECTORY -->
-    <section id="view-stores" class="hidden space-y-2">
+    <!-- VIEW 3: STORES DIRECTORY & CREATOR -->
+    <section id="view-stores" class="hidden space-y-4">
       <div id="storeList" class="space-y-2"></div>
+
+      <div class="bg-gray-900 border border-emerald-500/30 p-4 rounded-2xl space-y-3">
+        <div class="flex items-center justify-between">
+          <h3 class="font-bold text-sm text-white">Add New Store Location</h3>
+          <span class="text-[10px] bg-emerald-950 text-emerald-400 px-2 py-0.5 rounded font-mono font-bold">Admin</span>
+        </div>
+        <input type="text" id="newStoreName" placeholder="Store Name" class="w-full bg-black border border-gray-700 rounded-lg p-2.5 text-xs text-white focus:border-emerald-500" />
+        <input type="text" id="newStoreNumber" placeholder="Store ID (e.g. STORE-04)" class="w-full bg-black border border-gray-700 rounded-lg p-2.5 text-xs text-white focus:border-emerald-500" />
+        <input type="text" id="newStoreAddress" placeholder="Full Street Address" class="w-full bg-black border border-gray-700 rounded-lg p-2.5 text-xs text-white focus:border-emerald-500" />
+        <button onclick="saveNewStore()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold py-2.5 rounded-xl text-xs transition shadow-md shadow-emerald-950">
+          + Save Location
+        </button>
+      </div>
     </section>
 
   </main>
@@ -116,11 +114,12 @@
     A WREKLYN PRODUCT SYSTEM • ALL RIGHTS RESERVED
   </footer>
 
+  <!-- JAVASCRIPT LOGIC -->
   <script>
-    // Paste your exact Supabase credentials here:
     const SUPABASE_URL = "https://kwriljaflulqytkdfnkx.supabase.co/rest/v1/
 ";
-    const SUPABASE_ANON_KEY = "sb_publishable_5tSC2mhg8UAWHQXXStgQdg_PcJtJn4A";
+    const SUPABASE_ANON_KEY = "sb_publishable_5tSC2mhg8UAWHQXXStgQdg_PcJtJn4A
+";
     const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     let locations = [];
@@ -133,13 +132,15 @@
 
     async function fetchLocations() {
       const { data, error } = await client.from('locations').select('*');
-      if (data) {
+      if (data && data.length > 0) {
         locations = data;
         const filterEl = document.getElementById('locationFilter');
         const postEl = document.getElementById('postLocation');
         const listEl = document.getElementById('storeList');
+        const badgeEl = document.getElementById('networkBadge');
 
-        filterEl.innerHTML = '<option value="ALL">All 4 Locations (Within Travel Radius)</option>';
+        badgeEl.textContent = `${locations.length} Stores Live`;
+        filterEl.innerHTML = '<option value="ALL">All Network Locations</option>';
         postEl.innerHTML = '';
         listEl.innerHTML = '';
 
@@ -240,6 +241,32 @@
       }
     }
 
+    async function saveNewStore() {
+      const name = document.getElementById('newStoreName').value;
+      const storeNum = document.getElementById('newStoreNumber').value;
+      const address = document.getElementById('newStoreAddress').value;
+
+      if (!name || !storeNum || !address) return alert('Please fill in store name, number, and address');
+
+      const { error } = await client.from('locations').insert([{
+        name: name,
+        store_number: storeNum,
+        address: address,
+        latitude: 44.85,
+        longitude: -93.04
+      }]);
+
+      if (error) {
+        alert('Error saving location: ' + error.message);
+      } else {
+        alert('Store location added to your network!');
+        document.getElementById('newStoreName').value = '';
+        document.getElementById('newStoreNumber').value = '';
+        document.getElementById('newStoreAddress').value = '';
+        fetchLocations();
+      }
+    }
+
     function switchTab(tab) {
       ['open', 'post', 'stores'].forEach(t => {
         document.getElementById(`view-${t}`).classList.add('hidden');
@@ -247,125 +274,6 @@
       });
       document.getElementById(`view-${tab}`).classList.remove('hidden');
       document.getElementById(`tab-${tab}`).className = 'flex-1 py-2 text-xs font-bold rounded-lg bg-emerald-500 text-black transition shadow-sm';
-    }
-
-    init();
-  </script>
-</body>
-</html>
-      const { data, error } = await client.from('locations').select('*');
-      if (data) {
-        locations = data;
-        const filterEl = document.getElementById('locationFilter');
-        const postEl = document.getElementById('postLocation');
-        const listEl = document.getElementById('storeList');
-
-        filterEl.innerHTML = '<option value="ALL">All 4 Stores (Within Radius)</option>';
-        postEl.innerHTML = '';
-        listEl.innerHTML = '';
-
-        locations.forEach(loc => {
-          filterEl.innerHTML += `<option value="${loc.id}">${loc.name}</option>`;
-          postEl.innerHTML += `<option value="${loc.id}">${loc.name}</option>`;
-          listEl.innerHTML += `
-            <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl">
-              <div class="font-bold text-sm text-slate-200">${loc.name}</div>
-              <div class="text-xs text-slate-400">${loc.address}</div>
-              <div class="text-[11px] text-amber-500 mt-1 font-mono">${loc.store_number}</div>
-            </div>`;
-        });
-      }
-    }
-
-    async function loadShifts() {
-      const filterId = document.getElementById('locationFilter').value;
-      let query = client.from('shifts').select('*, locations(name, address)').eq('status', 'open_broadcast');
-      
-      if (filterId !== 'ALL') {
-        query = query.eq('location_id', filterId);
-      }
-
-      const { data: shifts, error } = await query;
-      const listEl = document.getElementById('shiftsList');
-
-      if (!shifts || shifts.length === 0) {
-        listEl.innerHTML = `
-          <div class="bg-slate-900/50 border border-slate-800 rounded-xl p-6 text-center text-slate-400 text-sm">
-            <i data-lucide="check-circle-2" class="w-8 h-8 text-emerald-500 mx-auto mb-2"></i>
-            All shifts currently covered! Check back soon.
-          </div>`;
-        lucide.createIcons();
-        return;
-      }
-
-      listEl.innerHTML = shifts.map(s => `
-        <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-3">
-          <div class="flex justify-between items-start">
-            <div>
-              <span class="text-xs font-bold text-amber-400 bg-amber-950/60 border border-amber-800/60 px-2 py-0.5 rounded">${s.shift_type} SHIFT (6 HRS)</span>
-              <h3 class="font-bold text-slate-100 text-sm mt-1.5">${s.locations?.name || 'Store'}</h3>
-              <p class="text-xs text-slate-400">${s.locations?.address || ''}</p>
-            </div>
-            <div class="text-right">
-              <span class="text-xs font-mono text-slate-300 block">${s.shift_date}</span>
-            </div>
-          </div>
-          ${s.notes ? `<p class="text-xs bg-slate-950 p-2 rounded text-slate-300 border border-slate-800">"${s.notes}"</p>` : ''}
-          <button onclick="claimShift('${s.id}')" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2 rounded-lg text-xs transition">
-            Claim This Shift (Manager Review)
-          </button>
-        </div>
-      `).join('');
-      lucide.createIcons();
-    }
-
-    async function postShift() {
-      const locId = document.getElementById('postLocation').value;
-      const date = document.getElementById('postDate').value;
-      const block = document.getElementById('postBlock').value;
-      const notes = document.getElementById('postNotes').value;
-
-      if (!date) return alert('Please pick a shift date');
-
-      const startHour = block === 'AM' ? 9 : (block === 'MID' ? 12 : 15);
-      const endHour = startHour + 6;
-
-      const { error } = await client.from('shifts').insert([{
-        location_id: locId,
-        shift_date: date,
-        start_time: `${date}T${startHour}:00:00Z`,
-        end_time: `${date}T${endHour}:00:00Z`,
-        shift_type: block,
-        status: 'open_broadcast',
-        notes: notes
-      }]);
-
-      if (error) {
-        alert('Error posting shift: ' + error.message);
-      } else {
-        alert('Shift posted successfully!');
-        switchTab('open');
-        loadShifts();
-      }
-    }
-
-    async function claimShift(shiftId) {
-      const { error } = await client.from('shifts').update({ status: 'swap_pending' }).eq('id', shiftId);
-      if (error) {
-        alert(error.message);
-      } else {
-        alert('Shift claim submitted for Manager Approval!');
-        loadShifts();
-      }
-    }
-
-    function switchTab(tab) {
-      ['open', 'post', 'stores'].forEach(t => {
-        document.getElementById(`view-${t}`).classList.add('hidden');
-        document.getElementById(`tab-${t}`).className = 'flex-1 py-2 text-xs font-semibold rounded-lg text-slate-400 transition';
-      });
-      document.getElementById(`view-${tab}`).classList.remove('hidden');
-      document.getElementById(`tab-${tab}`).className = 'flex-1 py-2 text-xs font-semibold rounded-lg bg-amber-500 text-slate-950 transition';
     }
 
     init();
