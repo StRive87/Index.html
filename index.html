@@ -47,8 +47,8 @@
     <div class="grid grid-cols-4 gap-1 bg-gray-900 p-1 rounded-xl border border-gray-800 text-center">
       <button type="button" onclick="switchTab('open')" id="tab-open" class="py-2 text-[11px] font-bold rounded-lg bg-emerald-500 text-black transition">Board</button>
       <button type="button" onclick="switchTab('post')" id="tab-post" class="py-2 text-[11px] font-bold rounded-lg text-gray-400 transition">Broadcast</button>
-      <button type="button" onclick="switchTab('chat')" id="tab-chat" class="py-2 text-[11px] font-bold rounded-lg text-gray-400 transition">Chat & Feed</button>
-      <button type="button" onclick="switchTab('stores')" id="tab-stores" class="py-2 text-[11px] font-bold rounded-lg text-gray-400 transition">Stores</button>
+      <button type="button" onclick="switchTab('chat')" id="tab-chat" class="py-2 text-[11px] font-bold rounded-lg text-gray-400 transition">Chat</button>
+      <button type="button" onclick="switchTab('admin')" id="tab-admin" class="py-2 text-[11px] font-bold rounded-lg text-gray-400 transition">Admin</button>
     </div>
 
     <!-- VIEW 1: OPEN SHIFTS -->
@@ -83,7 +83,7 @@
         </div>
         <div>
           <label class="text-xs font-medium text-gray-300">Notes / Duties</label>
-          <textarea id="postNotes" rows="2" placeholder="e.g. Register close, inventory count..." class="w-full bg-black border border-gray-700 rounded-lg p-2.5 text-sm text-gray-200 mt-1 focus:border-emerald-500"></textarea>
+          <textarea id="postNotes" rows="2" placeholder="e.g. Register close, stock delivery..." class="w-full bg-black border border-gray-700 rounded-lg p-2.5 text-sm text-gray-200 mt-1 focus:border-emerald-500"></textarea>
         </div>
         <button type="button" onclick="postShift()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-black py-3 rounded-xl text-sm transition shadow-lg shadow-emerald-950">
           Post Shift to Network
@@ -105,42 +105,77 @@
         <button type="button" onclick="setChatMode('private')" id="chat-mode-private" class="flex-1 py-1.5 text-xs font-bold rounded-lg text-gray-400 transition">Private Messages</button>
       </div>
 
-      <!-- Recipient Filter for PMs -->
+      <!-- Recipient Field for PMs -->
       <div id="privateRecipientField" class="hidden bg-gray-900 border border-emerald-950 p-2.5 rounded-xl space-y-1">
-        <label class="text-[10px] font-bold text-emerald-400 uppercase tracking-wider block">Send To Staff Member:</label>
-        <input type="text" id="chatRecipient" placeholder="Recipient's Name (e.g. Sam)" class="w-full bg-black border border-gray-700 rounded-lg p-2 text-xs text-white focus:border-emerald-500" />
+        <label class="text-[10px] font-bold text-emerald-400 uppercase tracking-wider block">Send Directly To (Name):</label>
+        <input type="text" id="chatRecipient" placeholder="e.g. Jordan" class="w-full bg-black border border-gray-700 rounded-lg p-2 text-xs text-white focus:border-emerald-500" />
       </div>
 
       <!-- Message Stream -->
-      <div id="chatStream" class="space-y-2.5 min-h-[220px] max-h-[360px] overflow-y-auto bg-black/50 p-3 rounded-2xl border border-gray-800/80">
+      <div id="chatStream" class="space-y-2.5 min-h-[200px] max-h-[320px] overflow-y-auto bg-black/50 p-3 rounded-2xl border border-gray-800/80">
         <div class="text-center py-6 text-xs text-gray-500">No messages yet.</div>
       </div>
 
       <!-- Composer Input -->
       <div class="flex gap-2">
-        <input type="text" id="chatInput" placeholder="Type a message or announcement..." onkeydown="if(event.key==='Enter') sendMessage();" class="flex-1 bg-black border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:border-emerald-500 focus:outline-none" />
+        <input type="text" id="chatInput" placeholder="Type a message..." onkeydown="if(event.key==='Enter') sendMessage();" class="flex-1 bg-black border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:border-emerald-500 focus:outline-none" />
         <button type="button" onclick="sendMessage()" class="bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold px-4 py-2 rounded-xl text-xs transition">
           Send
         </button>
       </div>
     </section>
 
-    <!-- VIEW 4: STORES DIRECTORY & CREATOR -->
-    <section id="view-stores" class="hidden space-y-4">
-      <div id="storeList" class="space-y-2"></div>
-
+    <!-- VIEW 4: ADMIN (STORES & STAFF) -->
+    <section id="view-admin" class="hidden space-y-5">
+      
+      <!-- ADD NEW STAFF -->
       <div class="bg-gray-900 border border-emerald-500/30 p-4 rounded-2xl space-y-3">
         <div class="flex items-center justify-between">
-          <h3 class="font-bold text-sm text-white">Add New Store Location</h3>
-          <span class="text-[10px] bg-emerald-950 text-emerald-400 px-2 py-0.5 rounded font-mono font-bold">Admin</span>
+          <h3 class="font-bold text-sm text-white">Add Staff Member</h3>
+          <span class="text-[10px] bg-emerald-950 text-emerald-400 px-2 py-0.5 rounded font-mono font-bold">Roster</span>
         </div>
-        <input type="text" id="newStoreName" placeholder="Store Name" class="w-full bg-black border border-gray-700 rounded-lg p-2.5 text-xs text-white focus:border-emerald-500" />
+        <input type="text" id="newStaffName" placeholder="Full Name (e.g. Marcus Vance)" class="w-full bg-black border border-gray-700 rounded-lg p-2.5 text-xs text-white focus:border-emerald-500" />
+        <input type="tel" id="newStaffPhone" placeholder="Phone Number (e.g. 651-555-0199)" class="w-full bg-black border border-gray-700 rounded-lg p-2.5 text-xs text-white focus:border-emerald-500" />
+        <select id="newStaffRole" class="w-full bg-black border border-gray-700 rounded-lg p-2.5 text-xs text-white focus:border-emerald-500">
+          <option value="employee">Role: Cashier / Staff</option>
+          <option value="manager">Role: Store Manager</option>
+          <option value="admin">Role: Admin / Owner</option>
+        </select>
+        <button type="button" onclick="saveNewStaff()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold py-2.5 rounded-xl text-xs transition shadow-md shadow-emerald-950">
+          + Add Staff Member
+        </button>
+      </div>
+
+      <!-- ACTIVE STAFF LIST -->
+      <div class="space-y-2">
+        <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Active Staff Directory</h4>
+        <div id="staffList" class="space-y-2">
+          <div class="text-xs text-gray-500 italic p-2">Loading staff roster...</div>
+        </div>
+      </div>
+
+      <hr class="border-gray-800 my-4" />
+
+      <!-- ADD NEW STORE LOCATION -->
+      <div class="bg-gray-900 border border-emerald-500/30 p-4 rounded-2xl space-y-3">
+        <div class="flex items-center justify-between">
+          <h3 class="font-bold text-sm text-white">Add Store Location</h3>
+          <span class="text-[10px] bg-emerald-950 text-emerald-400 px-2 py-0.5 rounded font-mono font-bold">Locations</span>
+        </div>
+        <input type="text" id="newStoreName" placeholder="Store Name (e.g. South St. Paul Vape)" class="w-full bg-black border border-gray-700 rounded-lg p-2.5 text-xs text-white focus:border-emerald-500" />
         <input type="text" id="newStoreNumber" placeholder="Store ID (e.g. STORE-04)" class="w-full bg-black border border-gray-700 rounded-lg p-2.5 text-xs text-white focus:border-emerald-500" />
         <input type="text" id="newStoreAddress" placeholder="Full Street Address" class="w-full bg-black border border-gray-700 rounded-lg p-2.5 text-xs text-white focus:border-emerald-500" />
         <button type="button" onclick="saveNewStore()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold py-2.5 rounded-xl text-xs transition shadow-md shadow-emerald-950">
           + Save Location
         </button>
       </div>
+
+      <!-- STORE DIRECTORY -->
+      <div class="space-y-2">
+        <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Store Locations</h4>
+        <div id="storeList" class="space-y-2"></div>
+      </div>
+
     </section>
 
   </main>
@@ -151,15 +186,17 @@
   </footer>
 
   <script>
+    // --- INSERT YOUR REAL SUPABASE CREDENTIALS HERE ---
     const SUPABASE_URL = "https://kwriljaflulqytkdfnkx.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_5tSC2mhg8UAWHQXXStgQdg_PcJtJn4A";
 
     let client = null;
     let locations = [];
+    let staffMembers = [];
     let currentChatMode = 'feed'; // 'feed' or 'private'
 
     function switchTab(tab) {
-      ['open', 'post', 'chat', 'stores'].forEach(t => {
+      ['open', 'post', 'chat', 'admin'].forEach(t => {
         document.getElementById(`view-${t}`).classList.add('hidden');
         document.getElementById(`tab-${t}`).className = 'py-2 text-[11px] font-bold rounded-lg text-gray-400 transition';
       });
@@ -194,14 +231,21 @@
         const savedUser = localStorage.getItem('ws_user') || 'Staff';
         document.getElementById('chatSenderName').value = savedUser;
 
+        // Register Service Worker for PWA
         if ('serviceWorker' in navigator) {
-          navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW failed', err));
+          navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW registration error:', err));
+        }
+
+        if (SUPABASE_URL.includes("YOUR_SUPABASE_URL") || SUPABASE_ANON_KEY.includes("YOUR_SUPABASE_ANON_KEY")) {
+          document.getElementById('shiftsList').innerHTML = '<div class="bg-red-950/60 border border-red-800 p-4 rounded-xl text-red-300 text-xs text-center font-mono">⚠️ ACTION REQUIRED: Insert your real Supabase URL and Key in index.html</div>';
+          document.getElementById('networkBadge').textContent = 'Key Missing';
+          return;
         }
 
         const cleanUrl = SUPABASE_URL.replace(/\/+$/, '');
         client = supabase.createClient(cleanUrl, SUPABASE_ANON_KEY);
 
-        // Listen for incoming live chat messages in realtime
+        // Realtime Subscription for incoming messages
         client.channel('realtime_messages')
           .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'team_messages' }, () => {
             loadMessages();
@@ -209,6 +253,7 @@
           .subscribe();
 
         await fetchLocations();
+        await fetchStaff();
         await loadShifts();
       } catch (err) {
         console.error("Init Error:", err);
@@ -248,6 +293,58 @@
         });
       } catch (e) {
         console.error(e);
+      }
+    }
+
+    async function fetchStaff() {
+      if (!client) return;
+      try {
+        const { data, error } = await client.from('staff').select('*').order('full_name', { ascending: true });
+        if (error) throw error;
+
+        staffMembers = data || [];
+        const staffListEl = document.getElementById('staffList');
+        if (staffListEl) {
+          if (staffMembers.length === 0) {
+            staffListEl.innerHTML = '<div class="text-xs text-gray-500 italic p-2">No staff registered yet. Add staff above.</div>';
+          } else {
+            staffListEl.innerHTML = staffMembers.map(person => `
+              <div class="bg-gray-900 border border-gray-800 p-3 rounded-xl flex justify-between items-center">
+                <div>
+                  <div class="font-bold text-xs text-white">${person.full_name}</div>
+                  <div class="text-[10px] text-gray-400">${person.phone || 'No phone'}</div>
+                </div>
+                <span class="text-[10px] bg-black text-emerald-400 px-2 py-0.5 rounded uppercase font-mono font-bold border border-gray-800">${person.role}</span>
+              </div>
+            `).join('');
+          }
+        }
+      } catch (e) {
+        console.error("Fetch Staff Error:", e);
+      }
+    }
+
+    async function saveNewStaff() {
+      if (!client) return;
+      const name = document.getElementById('newStaffName').value.trim();
+      const phone = document.getElementById('newStaffPhone').value.trim();
+      const role = document.getElementById('newStaffRole').value;
+
+      if (!name) return alert('Please enter the staff member’s full name.');
+
+      const { error } = await client.from('staff').insert([{
+        full_name: name,
+        phone: phone,
+        role: role
+      }]);
+
+      if (error) {
+        alert('Error saving staff: ' + error.message);
+      } else {
+        alert(`${name} added to the staff roster!`);
+        document.getElementById('newStaffName').value = '';
+        document.getElementById('newStaffPhone').value = '';
+        fetchStaff();
       }
     }
 
@@ -306,7 +403,6 @@
         return;
       }
 
-      // Filter DMs client-side so staff only see messages sent to or from them
       const visibleMsgs = currentChatMode === 'feed' 
         ? messages 
         : messages.filter(m => m.sender_name.toLowerCase() === currentUser || (m.recipient_name && m.recipient_name.toLowerCase() === currentUser));
@@ -435,3 +531,4 @@
   </script>
 </body>
 </html>
+
