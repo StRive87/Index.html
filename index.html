@@ -272,6 +272,26 @@
       }
       loadMessages();
     }
+    async function shareAppInvite() {
+  const shareData = {
+    title: 'Wreklyn Shift App',
+    text: 'Join our store shift board on Wreklyn Shift to view schedules, claim shifts, and message the team:',
+    url: window.location.origin + window.location.pathname
+  };
+
+  if (navigator.share) {
+    try {
+      await navigator.share(shareData);
+    } catch (err) {
+      console.log('Share dismissed');
+    }
+  } else {
+    // Fallback: Copy link to clipboard if sharing isn't supported on desktop browser
+    await navigator.clipboard.writeText(shareData.url);
+    alert('Invite link copied to clipboard!');
+  }
+}
+
 
     // ================= AUTHENTICATION LOGIC =================
     function setAuthMode(mode) {
