@@ -3,8 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Wreklyn Shift | Total Network View</title>
+  <title>Wreklyn Shift | Where Chaos Gets Corrected</title>
   
+  <!-- Progressive Web App (PWA) Manifest -->
+  <link rel="manifest" href="./manifest.json">
   <link rel="icon" type="image/png" href="./logo.png">
   <link rel="apple-touch-icon" href="./logo.png">
   <meta name="theme-color" content="#030712">
@@ -15,7 +17,7 @@
 </head>
 <body class="bg-gray-950 text-slate-100 min-h-screen flex flex-col font-sans pb-24 selection:bg-emerald-500 selection:text-black">
 
-  <!-- TOP HEADER & BRANDING -->
+  <!-- TOP BRAND HEADER -->
   <header class="bg-gray-900/90 backdrop-blur-md border-b border-emerald-950 px-4 py-3 sticky top-0 z-50 flex items-center justify-between shadow-lg">
     <div class="flex items-center gap-3">
       <img src="./logo.png" onerror="this.onerror=null; this.src='https://placehold.co/80x80/042f2e/10b981?text=WS';" alt="Logo" class="w-10 h-10 rounded-xl object-contain bg-black border border-emerald-500/30 p-0.5 shadow-md shadow-emerald-950/50" />
@@ -27,11 +29,11 @@
       </div>
     </div>
     <span id="networkBadge" class="text-[11px] bg-red-950/80 text-red-300 border border-red-800 px-2.5 py-1 rounded-full font-mono font-bold">
-      Offline
+      Connecting...
     </span>
   </header>
 
-  <!-- MAIN CONTAINER -->
+  <!-- MAIN APP CONTAINER -->
   <main class="flex-1 p-4 max-w-md mx-auto w-full space-y-4">
 
     <!-- STORE FILTER -->
@@ -114,15 +116,13 @@
     A WREKLYN PRODUCT SYSTEM • ALL RIGHTS RESERVED
   </footer>
 
-  <!-- JAVASCRIPT: Logic and Connection -->
   <script>
-    const SUPABASE_URL = "https://kwriljaflulqytkdfnkx.supabase.co";
-    const SUPABASE_ANON_KEY = "sb_publishable_5tSC2mhg8UAWHQXXStgQdg_PcJtJn4A";
+    const SUPABASE_URL = "YOUR_SUPABASE_URL";
+    const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
 
     let client = null;
     let locations = [];
 
-    // The Tab Switcher (always active and safe)
     function switchTab(tab) {
       ['open', 'post', 'stores'].forEach(t => {
         document.getElementById(`view-${t}`).classList.add('hidden');
@@ -132,30 +132,29 @@
       document.getElementById(`tab-${tab}`).className = 'flex-1 py-2 text-xs font-bold rounded-lg bg-emerald-500 text-black transition shadow-sm';
     }
 
-    // Startup Initialization
     async function init() {
       try {
         if (typeof lucide !== 'undefined') lucide.createIcons();
 
-        // Safety check for missing credentials
+        // Register Service Worker for PWA App Download
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.register('./sw.js').catch(err => console.log('Service Worker error:', err));
+        }
+
         if (SUPABASE_URL.includes("YOUR_SUPABASE_URL") || SUPABASE_ANON_KEY.includes("YOUR_SUPABASE_ANON_KEY")) {
-          const shiftListEl = document.getElementById('shiftsList');
-          shiftListEl.innerHTML = '<div class="bg-red-950/60 border border-red-800 p-4 rounded-xl text-red-300 text-xs text-center font-mono">⚠️ ACTION REQUIRED: Insert your Supabase URL and Publishable Key in index.html</div>';
+          document.getElementById('shiftsList').innerHTML = '<div class="bg-red-950/60 border border-red-800 p-4 rounded-xl text-red-300 text-xs text-center font-mono">⚠️ Action Required: Insert your Supabase URL and Key in index.html</div>';
           document.getElementById('networkBadge').textContent = 'Key Missing';
           return;
         }
 
-        // Correct Supabase client initialization
-        client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const cleanUrl = SUPABASE_URL.replace(/\/+$/, '');
+        client = supabase.createClient(cleanUrl, SUPABASE_ANON_KEY);
         
-        // Final connectivity check badge update
         await fetchLocations();
         await loadShifts();
-
       } catch (err) {
-        console.error("Initialization Error:", err);
-        const shiftListEl = document.getElementById('shiftsList');
-        shiftListEl.innerHTML = `<div class="p-4 text-center text-xs text-red-400 font-mono">Connection Error: ${err.message}</div>`;
+        console.error("Init Error:", err);
+        document.getElementById('shiftsList').innerHTML = `<div class="p-4 text-center text-xs text-red-400 font-mono">Connection Error: ${err.message}</div>`;
       }
     }
 
@@ -260,8 +259,8 @@
       const { error } = await client.from('shifts').insert([{
         location_id: locId,
         shift_date: date,
-        start_time: `${date}T${startHour}:00:00Z`,
-        end_time: `${date}T${endHour}:00:00Z`,
+        start_time: `${date}T${String(startHour).padStart(2, '0')}:00:00Z`,
+        end_time: `${date}T${String(endHour).padStart(2, '0')}:00:00Z`,
         shift_type: block,
         status: 'open_broadcast',
         notes: notes
@@ -314,7 +313,6 @@
       }
     }
 
-    // Direct startup execution
     window.onload = init;
   </script>
 </body>
