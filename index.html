@@ -16,23 +16,81 @@
 </head>
 <body class="bg-gray-950 text-slate-100 min-h-screen flex flex-col font-sans pb-24 selection:bg-emerald-500 selection:text-black">
 
-  <!-- TOP HEADER -->
+  <!-- ================= AUTHENTICATION MODAL OVERLAY ================= -->
+  <div id="authOverlay" class="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-gray-900 border border-emerald-500/40 rounded-3xl p-6 max-w-sm w-full space-y-5 shadow-2xl shadow-emerald-950/80">
+      
+      <!-- Brand Header in Login -->
+      <div class="text-center space-y-2">
+        <img src="./logo.png" onerror="this.onerror=null; this.src='https://placehold.co/80x80/042f2e/10b981?text=WS';" alt="Logo" class="w-14 h-14 rounded-2xl object-cover object-[50%_28%] mx-auto border border-emerald-500/40 bg-black p-0.5 shadow-lg shadow-emerald-950" />
+        <h2 class="text-xl font-black text-white tracking-tight">WREKLYN <span class="text-emerald-400">SHIFT</span></h2>
+        <p class="text-xs text-gray-400">Sign in to access store schedules & dispatch</p>
+      </div>
+
+      <!-- Auth Method Selector -->
+      <div class="flex bg-black p-1 rounded-xl border border-gray-800 text-xs font-bold">
+        <button type="button" onclick="setAuthMode('otp')" id="auth-tab-otp" class="flex-1 py-2 rounded-lg bg-emerald-500 text-black transition">Magic Code / OTP</button>
+        <button type="button" onclick="setAuthMode('password')" id="auth-tab-password" class="flex-1 py-2 rounded-lg text-gray-400 transition">Password</button>
+      </div>
+
+      <!-- Step 1: Request Email OTP -->
+      <div id="authEmailStep" class="space-y-3">
+        <div>
+          <label class="text-[11px] font-bold uppercase text-gray-400">Work / Personal Email</label>
+          <input type="email" id="authEmail" placeholder="employee@store.com" class="w-full bg-black border border-gray-700 rounded-xl p-3 text-sm text-white focus:border-emerald-500 focus:outline-none mt-1" />
+        </div>
+        
+        <div id="passwordFieldGroup" class="hidden space-y-1">
+          <label class="text-[11px] font-bold uppercase text-gray-400">Password</label>
+          <input type="password" id="authPassword" placeholder="••••••••" class="w-full bg-black border border-gray-700 rounded-xl p-3 text-sm text-white focus:border-emerald-500 focus:outline-none" />
+        </div>
+
+        <button type="button" onclick="handleAuthSubmit()" id="authSubmitBtn" class="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold py-3 rounded-xl text-sm transition shadow-lg shadow-emerald-950">
+          Send Verification Code
+        </button>
+      </div>
+
+      <!-- Step 2: Verify 6-Digit OTP -->
+      <div id="authOtpStep" class="hidden space-y-3">
+        <p class="text-xs text-emerald-400 text-center">We sent a 6-digit verification code to your email.</p>
+        <div>
+          <label class="text-[11px] font-bold uppercase text-gray-400">6-Digit Code</label>
+          <input type="text" id="authOtpCode" placeholder="123456" maxlength="6" class="w-full bg-black border border-gray-700 rounded-xl p-3 text-center tracking-widest text-lg font-mono font-bold text-emerald-400 focus:border-emerald-500 focus:outline-none mt-1" />
+        </div>
+        <button type="button" onclick="verifyOtpCode()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold py-3 rounded-xl text-sm transition shadow-lg shadow-emerald-950">
+          Verify & Sign In
+        </button>
+        <button type="button" onclick="resetAuthFlow()" class="w-full text-xs text-gray-500 hover:text-gray-300 py-1 text-center">
+          ← Back to email entry
+        </button>
+      </div>
+
+      <div id="authStatusMessage" class="text-center text-xs text-red-400 font-mono hidden"></div>
+    </div>
+  </div>
+
+  <!-- ================= TOP HEADER ================= -->
   <header class="bg-gray-900/90 backdrop-blur-md border-b border-emerald-950 px-4 py-3 sticky top-0 z-50 flex items-center justify-between shadow-lg">
     <div class="flex items-center gap-3">
-      <img src="./logo.png" onerror="this.onerror=null; this.src='https://placehold.co/80x80/042f2e/10b981?text=WS';" alt="Logo" class="w-10 h-10 rounded-xl object-contain bg-black border border-emerald-500/30 p-0.5 shadow-md shadow-emerald-950/50" />
+      <img src="./logo.png" onerror="this.onerror=null; this.src='https://placehold.co/80x80/042f2e/10b981?text=WS';" alt="Logo" class="w-10 h-10 rounded-xl object-cover object-[50%_28%] bg-black border border-emerald-500/30 p-0.5 shadow-md shadow-emerald-950/50" />
       <div>
         <h1 class="font-black text-base tracking-tight text-white leading-none">
           WREKLYN <span class="text-emerald-400">SHIFT</span>
         </h1>
-        <p class="text-[10px] text-emerald-500/90 font-medium tracking-wide italic mt-0.5">Where chaos gets corrected</p>
+        <p id="userEmailBadge" class="text-[10px] text-emerald-500/90 font-medium truncate max-w-[140px] mt-0.5">Where chaos gets corrected</p>
       </div>
     </div>
-    <span id="networkBadge" class="text-[11px] bg-red-950/80 text-red-300 border border-red-800 px-2.5 py-1 rounded-full font-mono font-bold">
-      Connecting...
-    </span>
+    <div class="flex items-center gap-2">
+      <span id="networkBadge" class="text-[10px] bg-emerald-950 text-emerald-400 border border-emerald-800 px-2 py-1 rounded-full font-mono font-bold">
+        Live
+      </span>
+      <button type="button" onclick="signOutUser()" title="Sign Out" class="bg-black hover:bg-red-950/50 text-gray-400 hover:text-red-400 border border-gray-800 p-2 rounded-xl transition">
+        <i data-lucide="log-out" class="w-4 h-4"></i>
+      </button>
+    </div>
   </header>
 
-  <!-- MAIN CONTAINER -->
+  <!-- ================= MAIN CONTAINER ================= -->
   <main class="flex-1 p-4 max-w-md mx-auto w-full space-y-4">
 
     <!-- STORE FILTER -->
@@ -93,30 +151,20 @@
 
     <!-- VIEW 3: TEAM CHAT & FEED -->
     <section id="view-chat" class="hidden space-y-3">
-      <!-- Identity Setup -->
-      <div class="bg-gray-900 border border-gray-800 rounded-xl p-3 flex items-center gap-2">
-        <label class="text-[10px] uppercase font-bold text-gray-400 shrink-0">Your Name:</label>
-        <input type="text" id="chatSenderName" placeholder="e.g. Alex" oninput="localStorage.setItem('ws_user', this.value); loadMessages();" class="flex-1 bg-black border border-gray-700 rounded-lg px-2.5 py-1 text-xs text-emerald-400 font-bold focus:border-emerald-500 focus:outline-none" />
-      </div>
-
-      <!-- Mode Selector -->
       <div class="flex bg-black p-1 rounded-xl border border-gray-800">
         <button type="button" onclick="setChatMode('feed')" id="chat-mode-feed" class="flex-1 py-1.5 text-xs font-bold rounded-lg bg-gray-800 text-white transition">Store Feed</button>
-        <button type="button" onclick="setChatMode('private')" id="chat-mode-private" class="flex-1 py-1.5 text-xs font-bold rounded-lg text-gray-400 transition">Private Messages</button>
+        <button type="button" onclick="setChatMode('private')" id="chat-mode-private" class="flex-1 py-1.5 text-xs font-bold rounded-lg text-gray-400 transition">Direct Message</button>
       </div>
 
-      <!-- Recipient Field for PMs -->
       <div id="privateRecipientField" class="hidden bg-gray-900 border border-emerald-950 p-2.5 rounded-xl space-y-1">
-        <label class="text-[10px] font-bold text-emerald-400 uppercase tracking-wider block">Send Directly To (Name):</label>
-        <input type="text" id="chatRecipient" placeholder="e.g. Jordan" class="w-full bg-black border border-gray-700 rounded-lg p-2 text-xs text-white focus:border-emerald-500" />
+        <label class="text-[10px] font-bold text-emerald-400 uppercase tracking-wider block">Send Directly To (Staff Name or Email):</label>
+        <input type="text" id="chatRecipient" placeholder="e.g. Jordan or staff@store.com" class="w-full bg-black border border-gray-700 rounded-lg p-2 text-xs text-white focus:border-emerald-500" />
       </div>
 
-      <!-- Message Stream -->
-      <div id="chatStream" class="space-y-2.5 min-h-[200px] max-h-[320px] overflow-y-auto bg-black/50 p-3 rounded-2xl border border-gray-800/80">
+      <div id="chatStream" class="space-y-2.5 min-h-[220px] max-h-[340px] overflow-y-auto bg-black/50 p-3 rounded-2xl border border-gray-800/80">
         <div class="text-center py-6 text-xs text-gray-500">No messages yet.</div>
       </div>
 
-      <!-- Composer Input -->
       <div class="flex gap-2">
         <input type="text" id="chatInput" placeholder="Type a message..." onkeydown="if(event.key==='Enter') sendMessage();" class="flex-1 bg-black border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:border-emerald-500 focus:outline-none" />
         <button type="button" onclick="sendMessage()" class="bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold px-4 py-2 rounded-xl text-xs transition">
@@ -149,9 +197,7 @@
       <!-- ACTIVE STAFF LIST -->
       <div class="space-y-2">
         <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Active Staff Directory</h4>
-        <div id="staffList" class="space-y-2">
-          <div class="text-xs text-gray-500 italic p-2">Loading staff roster...</div>
-        </div>
+        <div id="staffList" class="space-y-2"></div>
       </div>
 
       <hr class="border-gray-800 my-4" />
@@ -162,7 +208,7 @@
           <h3 class="font-bold text-sm text-white">Add Store Location</h3>
           <span class="text-[10px] bg-emerald-950 text-emerald-400 px-2 py-0.5 rounded font-mono font-bold">Locations</span>
         </div>
-        <input type="text" id="newStoreName" placeholder="Store Name (e.g. South St. Paul Vape)" class="w-full bg-black border border-gray-700 rounded-lg p-2.5 text-xs text-white focus:border-emerald-500" />
+        <input type="text" id="newStoreName" placeholder="Store Name" class="w-full bg-black border border-gray-700 rounded-lg p-2.5 text-xs text-white focus:border-emerald-500" />
         <input type="text" id="newStoreNumber" placeholder="Store ID (e.g. STORE-04)" class="w-full bg-black border border-gray-700 rounded-lg p-2.5 text-xs text-white focus:border-emerald-500" />
         <input type="text" id="newStoreAddress" placeholder="Full Street Address" class="w-full bg-black border border-gray-700 rounded-lg p-2.5 text-xs text-white focus:border-emerald-500" />
         <button type="button" onclick="saveNewStore()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold py-2.5 rounded-xl text-xs transition shadow-md shadow-emerald-950">
@@ -180,20 +226,20 @@
 
   </main>
 
-  <!-- WREKLYN FOOTER -->
   <footer class="text-center py-6 text-[10px] text-gray-600 font-mono tracking-widest mt-auto border-t border-gray-900">
     A WREKLYN PRODUCT SYSTEM • ALL RIGHTS RESERVED
   </footer>
 
   <script>
-    // --- INSERT YOUR REAL SUPABASE CREDENTIALS HERE ---
     const SUPABASE_URL = "https://kwriljaflulqytkdfnkx.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_5tSC2mhg8UAWHQXXStgQdg_PcJtJn4A";
 
     let client = null;
+    let currentUser = null;
     let locations = [];
     let staffMembers = [];
-    let currentChatMode = 'feed'; // 'feed' or 'private'
+    let currentChatMode = 'feed';
+    let authMode = 'otp'; // 'otp' or 'password'
 
     function switchTab(tab) {
       ['open', 'post', 'chat', 'admin'].forEach(t => {
@@ -223,43 +269,151 @@
       loadMessages();
     }
 
+    // ================= AUTHENTICATION LOGIC =================
+    function setAuthMode(mode) {
+      authMode = mode;
+      const otpTab = document.getElementById('auth-tab-otp');
+      const pwTab = document.getElementById('auth-tab-password');
+      const pwGroup = document.getElementById('passwordFieldGroup');
+      const submitBtn = document.getElementById('authSubmitBtn');
+
+      if (mode === 'otp') {
+        otpTab.className = 'flex-1 py-2 rounded-lg bg-emerald-500 text-black transition';
+        pwTab.className = 'flex-1 py-2 rounded-lg text-gray-400 transition';
+        pwGroup.classList.add('hidden');
+        submitBtn.textContent = 'Send Verification Code';
+      } else {
+        otpTab.className = 'flex-1 py-2 rounded-lg text-gray-400 transition';
+        pwTab.className = 'flex-1 py-2 rounded-lg bg-emerald-500 text-black transition';
+        pwGroup.classList.remove('hidden');
+        submitBtn.textContent = 'Sign In with Password';
+      }
+    }
+
+    async function handleAuthSubmit() {
+      const email = document.getElementById('authEmail').value.trim();
+      const statusEl = document.getElementById('authStatusMessage');
+      statusEl.classList.add('hidden');
+
+      if (!email) {
+        statusEl.textContent = 'Please enter your email address.';
+        statusEl.classList.remove('hidden');
+        return;
+      }
+
+      if (authMode === 'otp') {
+        const { error } = await client.auth.signInWithOtp({
+          email: email,
+          options: { emailRedirectTo: window.location.href }
+        });
+        if (error) {
+          statusEl.textContent = error.message;
+          statusEl.classList.remove('hidden');
+        } else {
+          document.getElementById('authEmailStep').classList.add('hidden');
+          document.getElementById('authOtpStep').classList.remove('hidden');
+        }
+      } else {
+        const password = document.getElementById('authPassword').value;
+        if (!password) {
+          statusEl.textContent = 'Please enter your password.';
+          statusEl.classList.remove('hidden');
+          return;
+        }
+        const { data, error } = await client.auth.signInWithPassword({ email, password });
+        if (error) {
+          statusEl.textContent = error.message;
+          statusEl.classList.remove('hidden');
+        } else {
+          onUserAuthenticated(data.user);
+        }
+      }
+    }
+
+    async function verifyOtpCode() {
+      const email = document.getElementById('authEmail').value.trim();
+      const token = document.getElementById('authOtpCode').value.trim();
+      const statusEl = document.getElementById('authStatusMessage');
+
+      if (!token) return alert('Please enter the 6-digit code');
+
+      const { data, error } = await client.auth.verifyOtp({
+        email: email,
+        token: token,
+        type: 'email'
+      });
+
+      if (error) {
+        statusEl.textContent = error.message;
+        statusEl.classList.remove('hidden');
+      } else {
+        onUserAuthenticated(data.user);
+      }
+    }
+
+    function resetAuthFlow() {
+      document.getElementById('authOtpStep').classList.add('hidden');
+      document.getElementById('authEmailStep').classList.remove('hidden');
+      document.getElementById('authStatusMessage').classList.add('hidden');
+    }
+
+    function onUserAuthenticated(user) {
+      currentUser = user;
+      document.getElementById('authOverlay').classList.add('hidden');
+      document.getElementById('userEmailBadge').textContent = user.email || 'Logged In';
+      fetchLocations();
+      fetchStaff();
+      loadShifts();
+      loadMessages();
+    }
+
+    async function signOutUser() {
+      if (confirm('Sign out of Wreklyn Shift?')) {
+        await client.auth.signOut();
+        currentUser = null;
+        document.getElementById('authOverlay').classList.remove('hidden');
+        resetAuthFlow();
+      }
+    }
+
+    // ================= INITIALIZATION =================
     async function init() {
       try {
         if (typeof lucide !== 'undefined') lucide.createIcons();
-        
-        // Restore cached user name
-        const savedUser = localStorage.getItem('ws_user') || 'Staff';
-        document.getElementById('chatSenderName').value = savedUser;
 
-        // Register Service Worker for PWA
         if ('serviceWorker' in navigator) {
-          navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW registration error:', err));
-        }
-
-        if (SUPABASE_URL.includes("YOUR_SUPABASE_URL") || SUPABASE_ANON_KEY.includes("YOUR_SUPABASE_ANON_KEY")) {
-          document.getElementById('shiftsList').innerHTML = '<div class="bg-red-950/60 border border-red-800 p-4 rounded-xl text-red-300 text-xs text-center font-mono">⚠️ ACTION REQUIRED: Insert your real Supabase URL and Key in index.html</div>';
-          document.getElementById('networkBadge').textContent = 'Key Missing';
-          return;
+          navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW error:', err));
         }
 
         const cleanUrl = SUPABASE_URL.replace(/\/+$/, '');
         client = supabase.createClient(cleanUrl, SUPABASE_ANON_KEY);
 
-        // Realtime Subscription for incoming messages
+        // Check active session
+        const { data: { session } } = await client.auth.getSession();
+        if (session && session.user) {
+          onUserAuthenticated(session.user);
+        } else {
+          document.getElementById('authOverlay').classList.remove('hidden');
+        }
+
+        client.auth.onAuthStateChange((_event, session) => {
+          if (session && session.user) {
+            onUserAuthenticated(session.user);
+          }
+        });
+
         client.channel('realtime_messages')
           .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'team_messages' }, () => {
             loadMessages();
           })
           .subscribe();
 
-        await fetchLocations();
-        await fetchStaff();
-        await loadShifts();
       } catch (err) {
         console.error("Init Error:", err);
       }
     }
 
+    // ================= CORE APP DATA FUNCTIONS =================
     async function fetchLocations() {
       if (!client) return;
       try {
@@ -270,10 +424,6 @@
         const filterEl = document.getElementById('locationFilter');
         const postEl = document.getElementById('postLocation');
         const listEl = document.getElementById('storeList');
-        const badgeEl = document.getElementById('networkBadge');
-
-        badgeEl.textContent = locations.length + ' Stores Live';
-        badgeEl.className = 'text-[11px] bg-emerald-950 text-emerald-400 border border-emerald-800 px-2.5 py-1 rounded-full font-mono font-bold';
 
         filterEl.innerHTML = '<option value="ALL">All Network Locations</option>';
         postEl.innerHTML = '';
@@ -306,7 +456,7 @@
         const staffListEl = document.getElementById('staffList');
         if (staffListEl) {
           if (staffMembers.length === 0) {
-            staffListEl.innerHTML = '<div class="text-xs text-gray-500 italic p-2">No staff registered yet. Add staff above.</div>';
+            staffListEl.innerHTML = '<div class="text-xs text-gray-500 italic p-2">No staff registered yet.</div>';
           } else {
             staffListEl.innerHTML = staffMembers.map(person => `
               <div class="bg-gray-900 border border-gray-800 p-3 rounded-xl flex justify-between items-center">
@@ -330,7 +480,7 @@
       const phone = document.getElementById('newStaffPhone').value.trim();
       const role = document.getElementById('newStaffRole').value;
 
-      if (!name) return alert('Please enter the staff member’s full name.');
+      if (!name) return alert('Please enter full name');
 
       const { error } = await client.from('staff').insert([{
         full_name: name,
@@ -339,9 +489,9 @@
       }]);
 
       if (error) {
-        alert('Error saving staff: ' + error.message);
+        alert('Error: ' + error.message);
       } else {
-        alert(`${name} added to the staff roster!`);
+        alert(`${name} added to staff roster!`);
         document.getElementById('newStaffName').value = '';
         document.getElementById('newStaffPhone').value = '';
         fetchStaff();
@@ -385,8 +535,8 @@
     }
 
     async function loadMessages() {
-      if (!client) return;
-      const currentUser = document.getElementById('chatSenderName').value.trim().toLowerCase();
+      if (!client || !currentUser) return;
+      const userIdent = currentUser.email.toLowerCase();
       let query = client.from('team_messages').select('*').order('created_at', { ascending: true });
 
       if (currentChatMode === 'feed') {
@@ -399,27 +549,27 @@
       const streamEl = document.getElementById('chatStream');
 
       if (!messages || messages.length === 0) {
-        streamEl.innerHTML = `<div class="text-center py-8 text-xs text-gray-500 font-mono">No ${currentChatMode === 'feed' ? 'feed posts' : 'private messages'} yet.</div>`;
+        streamEl.innerHTML = `<div class="text-center py-8 text-xs text-gray-500 font-mono">No ${currentChatMode === 'feed' ? 'feed posts' : 'direct messages'} yet.</div>`;
         return;
       }
 
-      const visibleMsgs = currentChatMode === 'feed' 
-        ? messages 
-        : messages.filter(m => m.sender_name.toLowerCase() === currentUser || (m.recipient_name && m.recipient_name.toLowerCase() === currentUser));
+      const visibleMsgs = currentChatMode === 'feed'
+        ? messages
+        : messages.filter(m => m.sender_name.toLowerCase() === userIdent || (m.recipient_name && m.recipient_name.toLowerCase().includes(userIdent.split('@')[0])));
 
       if (visibleMsgs.length === 0) {
-        streamEl.innerHTML = `<div class="text-center py-8 text-xs text-gray-500 font-mono">No private messages for "${currentUser}".</div>`;
+        streamEl.innerHTML = `<div class="text-center py-8 text-xs text-gray-500 font-mono">No direct messages for you.</div>`;
         return;
       }
 
       streamEl.innerHTML = visibleMsgs.map(m => {
-        const isSelf = m.sender_name.toLowerCase() === currentUser;
+        const isSelf = m.sender_name.toLowerCase() === userIdent;
         const time = new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
         return `
           <div class="p-2.5 rounded-xl text-xs space-y-1 ${isSelf ? 'bg-emerald-950/60 border border-emerald-800/80 ml-6' : 'bg-gray-900 border border-gray-800 mr-6'}">
             <div class="flex justify-between items-center text-[10px] text-gray-400">
-              <span class="font-bold ${isSelf ? 'text-emerald-400' : 'text-slate-300'}">${m.sender_name} ${m.recipient_name ? '➜ ' + m.recipient_name : ''}</span>
+              <span class="font-bold ${isSelf ? 'text-emerald-400' : 'text-slate-300'}">${m.sender_name.split('@')[0]} ${m.recipient_name ? '➜ ' + m.recipient_name : ''}</span>
               <span class="font-mono text-[9px] text-gray-500">${time}</span>
             </div>
             <p class="text-slate-200">${m.content}</p>
@@ -431,18 +581,16 @@
     }
 
     async function sendMessage() {
-      if (!client) return;
-      const sender = document.getElementById('chatSenderName').value.trim();
+      if (!client || !currentUser) return;
       const content = document.getElementById('chatInput').value.trim();
       const recipient = document.getElementById('chatRecipient').value.trim();
       const locationId = document.getElementById('locationFilter').value;
 
-      if (!sender) return alert('Please enter your name first');
       if (!content) return;
-      if (currentChatMode === 'private' && !recipient) return alert('Please enter the recipient staff name for direct message');
+      if (currentChatMode === 'private' && !recipient) return alert('Please enter recipient staff name or email');
 
       const { error } = await client.from('team_messages').insert([{
-        sender_name: sender,
+        sender_name: currentUser.email,
         recipient_name: currentChatMode === 'private' ? recipient : null,
         message_type: currentChatMode,
         location_id: locationId !== 'ALL' ? locationId : null,
@@ -450,7 +598,7 @@
       }]);
 
       if (error) {
-        alert('Failed to send: ' + error.message);
+        alert('Failed: ' + error.message);
       } else {
         document.getElementById('chatInput').value = '';
         loadMessages();
@@ -464,8 +612,8 @@
       const block = document.getElementById('postBlock').value;
       const notes = document.getElementById('postNotes').value;
 
-      if (!locId) return alert('Please select a store location.');
-      if (!date) return alert('Please pick a shift date.');
+      if (!locId) return alert('Select store');
+      if (!date) return alert('Pick date');
 
       const startHour = block === 'AM' ? 9 : (block === 'MID' ? 12 : 15);
       const endHour = startHour + 6;
@@ -483,7 +631,7 @@
       if (error) {
         alert('Error: ' + error.message);
       } else {
-        alert('Shift broadcasted to the Wreklyn network!');
+        alert('Shift broadcasted to network!');
         switchTab('open');
         loadShifts();
       }
@@ -492,10 +640,9 @@
     async function claimShift(shiftId) {
       if (!client) return;
       const { error } = await client.from('shifts').update({ status: 'swap_pending' }).eq('id', shiftId);
-      if (error) {
-        alert(error.message);
-      } else {
-        alert('Shift claim sent to Store Manager for final sign-off!');
+      if (error) alert(error.message);
+      else {
+        alert('Shift claim submitted!');
         loadShifts();
       }
     }
@@ -506,7 +653,7 @@
       const storeNum = document.getElementById('newStoreNumber').value;
       const address = document.getElementById('newStoreAddress').value;
 
-      if (!name || !storeNum || !address) return alert('Please fill in all store fields');
+      if (!name || !storeNum || !address) return alert('Fill in all store fields');
 
       const { error } = await client.from('locations').insert([{
         name: name,
@@ -517,9 +664,9 @@
       }]);
 
       if (error) {
-        alert('Error saving location: ' + error.message);
+        alert('Error: ' + error.message);
       } else {
-        alert('Store location added to your network!');
+        alert('Store location added!');
         document.getElementById('newStoreName').value = '';
         document.getElementById('newStoreNumber').value = '';
         document.getElementById('newStoreAddress').value = '';
