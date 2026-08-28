@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Wreklyn Shift | Where Chaos Gets Corrected</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Wreklyn Shift | Total Network View</title>
   
-  <link rel="icon" type="image/png" href="./logo.png" />
-  <link rel="apple-touch-icon" href="./logo.png" />
-  <meta name="theme-color" content="#030712" />
+  <link rel="icon" type="image/png" href="./logo.png">
+  <link rel="apple-touch-icon" href="./logo.png">
+  <meta name="theme-color" content="#030712">
   
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -15,23 +15,23 @@
 </head>
 <body class="bg-gray-950 text-slate-100 min-h-screen flex flex-col font-sans pb-24 selection:bg-emerald-500 selection:text-black">
 
-  <!-- TOP HEADER -->
-  <header class="bg-gray-900 border-b border-emerald-950 px-4 py-3 sticky top-0 z-50 flex items-center justify-between shadow-lg">
+  <!-- TOP HEADER & BRANDING -->
+  <header class="bg-gray-900/90 backdrop-blur-md border-b border-emerald-950 px-4 py-3 sticky top-0 z-50 flex items-center justify-between shadow-lg">
     <div class="flex items-center gap-3">
       <img src="./logo.png" onerror="this.onerror=null; this.src='https://placehold.co/80x80/042f2e/10b981?text=WS';" alt="Logo" class="w-10 h-10 rounded-xl object-contain bg-black border border-emerald-500/30 p-0.5 shadow-md shadow-emerald-950/50" />
       <div>
-        <h1 class="font-black text-base text-white leading-none">
+        <h1 class="font-black text-base tracking-tight text-white leading-none">
           WREKLYN <span class="text-emerald-400">SHIFT</span>
         </h1>
-        <p class="text-[10px] text-emerald-500/90 font-medium italic mt-0.5">Where chaos gets corrected</p>
+        <p class="text-[10px] text-emerald-500/90 font-medium tracking-wide italic mt-0.5">Where chaos gets corrected</p>
       </div>
     </div>
-    <span id="networkBadge" class="text-[11px] bg-emerald-950 text-emerald-400 border border-emerald-800 px-2.5 py-1 rounded-full font-mono font-bold">
-      3 Stores Live
+    <span id="networkBadge" class="text-[11px] bg-red-950/80 text-red-300 border border-red-800 px-2.5 py-1 rounded-full font-mono font-bold">
+      Offline
     </span>
   </header>
 
-  <!-- MAIN APP CONTAINER -->
+  <!-- MAIN CONTAINER -->
   <main class="flex-1 p-4 max-w-md mx-auto w-full space-y-4">
 
     <!-- STORE FILTER -->
@@ -42,11 +42,11 @@
       </select>
     </div>
 
-    <!-- TABS (Corrected with onclick functions) -->
+    <!-- TABS -->
     <div class="flex bg-gray-900 p-1 rounded-xl border border-gray-800">
-      <button onclick="switchTab('open')" id="tab-open" class="flex-1 py-2 text-xs font-bold rounded-lg bg-emerald-500 text-black transition shadow-sm">Open Board</button>
-      <button onclick="switchTab('post')" id="tab-post" class="flex-1 py-2 text-xs font-bold rounded-lg text-gray-400 transition">Broadcast</button>
-      <button onclick="switchTab('stores')" id="tab-stores" class="flex-1 py-2 text-xs font-bold rounded-lg text-gray-400 transition">Stores & Admin</button>
+      <button type="button" onclick="switchTab('open')" id="tab-open" class="flex-1 py-2 text-xs font-bold rounded-lg bg-emerald-500 text-black transition shadow-sm">Open Board</button>
+      <button type="button" onclick="switchTab('post')" id="tab-post" class="flex-1 py-2 text-xs font-bold rounded-lg text-gray-400 transition">Broadcast</button>
+      <button type="button" onclick="switchTab('stores')" id="tab-stores" class="flex-1 py-2 text-xs font-bold rounded-lg text-gray-400 transition">Stores & Admin</button>
     </div>
 
     <!-- VIEW 1: OPEN SHIFTS -->
@@ -56,7 +56,7 @@
       </div>
     </section>
 
-    <!-- VIEW 2: BROADCAST SHIFT (New panel added) -->
+    <!-- VIEW 2: BROADCAST SHIFT -->
     <section id="view-post" class="hidden space-y-3 bg-gray-900 p-4 rounded-xl border border-gray-800">
       <div class="border-b border-gray-800 pb-2">
         <h2 class="font-bold text-sm text-white">Broadcast Unwanted Shift</h2>
@@ -81,26 +81,27 @@
         </div>
         <div>
           <label class="text-xs font-medium text-gray-300">Notes / Duties</label>
-          <textarea id="postNotes" rows="2" placeholder="e.g. Closing duties, delivery inventory..." class="w-full bg-black border border-gray-700 rounded-lg p-2.5 text-sm text-gray-200 mt-1 focus:border-emerald-500"></textarea>
+          <textarea id="postNotes" rows="2" placeholder="e.g. Register close, stock delivery..." class="w-full bg-black border border-gray-700 rounded-lg p-2.5 text-sm text-gray-200 mt-1 focus:border-emerald-500"></textarea>
         </div>
-        <button onclick="postShift()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-black py-3 rounded-xl text-sm transition shadow-lg shadow-emerald-950">
+        <button type="button" onclick="postShift()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-black py-3 rounded-xl text-sm transition shadow-lg shadow-emerald-950">
           Post Shift to Network
         </button>
       </div>
     </section>
 
-    <!-- VIEW 3: STORES DIRECTORY & CREATOR (New panel added) -->
+    <!-- VIEW 3: STORES DIRECTORY & CREATOR -->
     <section id="view-stores" class="hidden space-y-4">
       <div id="storeList" class="space-y-2"></div>
+
       <div class="bg-gray-900 border border-emerald-500/30 p-4 rounded-2xl space-y-3">
         <div class="flex items-center justify-between">
           <h3 class="font-bold text-sm text-white">Add New Store Location</h3>
           <span class="text-[10px] bg-emerald-950 text-emerald-400 px-2 py-0.5 rounded font-mono font-bold">Admin</span>
         </div>
-        <input type="text" id="newStoreName" placeholder="Store Name (e.g. Vapour Shoppe)" class="w-full bg-black border border-gray-700 rounded-lg p-2.5 text-xs text-white focus:border-emerald-500" />
-        <input type="text" id="newStoreNumber" placeholder="Store ID (e.g. STORE-04)" class="w-full bg-black border border-gray-700 rounded-lg p-2.5 text-xs text-white focus:border-emerald-500" />
+        <input type="text" id="newStoreName" placeholder="Store Name (e.g. Inver Grove Vape)" class="w-full bg-black border border-gray-700 rounded-lg p-2.5 text-xs text-white focus:border-emerald-500" />
+        <input type="text" id="newStoreNumber" placeholder="Store ID (e.g. STORE-01)" class="w-full bg-black border border-gray-700 rounded-lg p-2.5 text-xs text-white focus:border-emerald-500" />
         <input type="text" id="newStoreAddress" placeholder="Full Street Address" class="w-full bg-black border border-gray-700 rounded-lg p-2.5 text-xs text-white focus:border-emerald-500" />
-        <button onclick="saveNewStore()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold py-2.5 rounded-xl text-xs transition shadow-md shadow-emerald-950">
+        <button type="button" onclick="saveNewStore()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold py-2.5 rounded-xl text-xs transition shadow-md shadow-emerald-950">
           + Save Location
         </button>
       </div>
@@ -108,34 +109,71 @@
 
   </main>
 
+  <!-- WREKLYN FOOTER -->
   <footer class="text-center py-6 text-[10px] text-gray-600 font-mono tracking-widest mt-auto border-t border-gray-900">
     A WREKLYN PRODUCT SYSTEM • ALL RIGHTS RESERVED
   </footer>
 
-  <!-- JAVASCRIPT: Make everything work -->
+  <!-- JAVASCRIPT: Logic and Connection -->
   <script>
-    const SUPABASE_URL = "https://kwriljaflulqytkdfnkx.supabase.co/rest/v1/";
+    const SUPABASE_URL = "https://kwriljaflulqytkdfnkx.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_5tSC2mhg8UAWHQXXStgQdg_PcJtJn4A";
-    const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+    let client = null;
     let locations = [];
 
+    // The Tab Switcher (always active and safe)
+    function switchTab(tab) {
+      ['open', 'post', 'stores'].forEach(t => {
+        document.getElementById(`view-${t}`).classList.add('hidden');
+        document.getElementById(`tab-${t}`).className = 'flex-1 py-2 text-xs font-bold rounded-lg text-gray-400 transition';
+      });
+      document.getElementById(`view-${tab}`).classList.remove('hidden');
+      document.getElementById(`tab-${tab}`).className = 'flex-1 py-2 text-xs font-bold rounded-lg bg-emerald-500 text-black transition shadow-sm';
+    }
+
+    // Startup Initialization
     async function init() {
-      lucide.createIcons();
-      await fetchLocations();
-      await loadShifts();
+      try {
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+
+        // Safety check for missing credentials
+        if (SUPABASE_URL.includes("YOUR_SUPABASE_URL") || SUPABASE_ANON_KEY.includes("YOUR_SUPABASE_ANON_KEY")) {
+          const shiftListEl = document.getElementById('shiftsList');
+          shiftListEl.innerHTML = '<div class="bg-red-950/60 border border-red-800 p-4 rounded-xl text-red-300 text-xs text-center font-mono">⚠️ ACTION REQUIRED: Insert your Supabase URL and Publishable Key in index.html</div>';
+          document.getElementById('networkBadge').textContent = 'Key Missing';
+          return;
+        }
+
+        // Correct Supabase client initialization
+        client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // Final connectivity check badge update
+        await fetchLocations();
+        await loadShifts();
+
+      } catch (err) {
+        console.error("Initialization Error:", err);
+        const shiftListEl = document.getElementById('shiftsList');
+        shiftListEl.innerHTML = `<div class="p-4 text-center text-xs text-red-400 font-mono">Connection Error: ${err.message}</div>`;
+      }
     }
 
     async function fetchLocations() {
-      const { data, error } = await client.from('locations').select('*');
-      if (data && data.length > 0) {
-        locations = data;
+      if (!client) return;
+      try {
+        const { data, error } = await client.from('locations').select('*');
+        if (error) throw error;
+
+        locations = data || [];
         const filterEl = document.getElementById('locationFilter');
         const postEl = document.getElementById('postLocation');
         const listEl = document.getElementById('storeList');
         const badgeEl = document.getElementById('networkBadge');
 
-        badgeEl.textContent = `${locations.length} Stores Live`;
+        badgeEl.textContent = locations.length + ' Stores Live';
+        badgeEl.className = 'text-[11px] bg-emerald-950 text-emerald-400 border border-emerald-800 px-2.5 py-1 rounded-full font-mono font-bold';
+
         filterEl.innerHTML = '<option value="ALL">All Network Locations</option>';
         postEl.innerHTML = '';
         listEl.innerHTML = '';
@@ -149,61 +187,72 @@
                 <div class="font-bold text-sm text-white">${loc.name}</div>
                 <div class="text-xs text-gray-400 mt-0.5">${loc.address}</div>
               </div>
-              <span class="text-[10px] text-emerald-400 bg-emerald-950/80 border border-emerald-800 px-2 py-1 rounded font-mono font-bold">${loc.store_number}</span>
+              <span class="text-[10px] text-emerald-400 bg-emerald-950 border border-emerald-800 px-2 py-1 rounded font-mono font-bold">${loc.store_number}</span>
             </div>`;
         });
+      } catch (e) {
+        console.error("Fetch Locations Error:", e);
       }
     }
 
     async function loadShifts() {
-      const filterId = document.getElementById('locationFilter').value;
-      let query = client.from('shifts').select('*, locations(name, address)').eq('status', 'open_broadcast');
-      
-      if (filterId !== 'ALL') {
-        query = query.eq('location_id', filterId);
+      if (!client) return;
+      try {
+        const filterId = document.getElementById('locationFilter').value;
+        let query = client.from('shifts').select('*, locations(name, address)').eq('status', 'open_broadcast');
+        
+        if (filterId !== 'ALL') {
+          query = query.eq('location_id', filterId);
+        }
+
+        const { data: shifts, error } = await query;
+        if (error) throw error;
+
+        const listEl = document.getElementById('shiftsList');
+
+        if (!shifts || shifts.length === 0) {
+          listEl.innerHTML = '<div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 text-center text-gray-400 text-sm"><i data-lucide="shield-check" class="w-10 h-10 text-emerald-500 mx-auto mb-2 opacity-90"></i>All shifts currently covered across network!</div>';
+          if (typeof lucide !== 'undefined') lucide.createIcons();
+          return;
+        }
+
+        listEl.innerHTML = shifts.map(s => {
+          const storeName = s.locations ? s.locations.name : 'Store';
+          const storeAddr = s.locations ? s.locations.address : '';
+          const noteHtml = s.notes ? `<p class="text-xs bg-black p-2.5 rounded-lg text-gray-300 border border-gray-800 italic">"${s.notes}"</p>` : '';
+          
+          return `
+            <div class="bg-gray-900 border border-gray-800 rounded-2xl p-4 space-y-3 shadow-md">
+              <div class="flex justify-between items-start">
+                <div>
+                  <span class="text-[11px] font-black text-emerald-300 bg-emerald-950 border border-emerald-800 px-2.5 py-0.5 rounded-full uppercase tracking-wider">${s.shift_type} • 6 HOURS</span>
+                  <h3 class="font-bold text-white text-base mt-2">${storeName}</h3>
+                  <p class="text-xs text-gray-400">${storeAddr}</p>
+                </div>
+                <div class="text-right">
+                  <span class="text-xs font-mono text-emerald-400 font-bold bg-black px-2 py-1 rounded border border-gray-800">${s.shift_date}</span>
+                </div>
+              </div>
+              ${noteHtml}
+              <button type="button" onclick="claimShift('${s.id}')" class="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold py-2.5 rounded-xl text-xs transition">Claim Shift (Submit to Manager)</button>
+            </div>`;
+        }).join('');
+        
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+      } catch (e) {
+        console.error("Load Shifts Error:", e);
       }
-
-      const { data: shifts, error } = await query;
-      const listEl = document.getElementById('shiftsList');
-
-      if (!shifts || shifts.length === 0) {
-        listEl.innerHTML = `
-          <div class="bg-gray-900/60 border border-gray-800 rounded-2xl p-6 text-center text-gray-400 text-sm">
-            <i data-lucide="shield-check" class="w-10 h-10 text-emerald-500 mx-auto mb-2 opacity-90"></i>
-            All shifts currently covered across network!
-          </div>`;
-        lucide.createIcons();
-        return;
-      }
-
-      listEl.innerHTML = shifts.map(s => `
-        <div class="bg-gray-900 border border-gray-800 rounded-2xl p-4 space-y-3 shadow-md hover:border-emerald-500/40 transition">
-          <div class="flex justify-between items-start">
-            <div>
-              <span class="text-[11px] font-black text-emerald-300 bg-emerald-950 border border-emerald-800 px-2.5 py-0.5 rounded-full uppercase tracking-wider">${s.shift_type} • 6 HOURS</span>
-              <h3 class="font-bold text-white text-base mt-2">${s.locations?.name || 'Store'}</h3>
-              <p class="text-xs text-gray-400">${s.locations?.address || ''}</p>
-            </div>
-            <div class="text-right">
-              <span class="text-xs font-mono text-emerald-400 font-bold bg-black px-2 py-1 rounded border border-gray-800">${s.shift_date}</span>
-            </div>
-          </div>
-          ${s.notes ? `<p class="text-xs bg-black/80 p-2.5 rounded-lg text-gray-300 border border-gray-800/80 italic">"${s.notes}"</p>` : ''}
-          <button onclick="claimShift('${s.id}')" class="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold py-2.5 rounded-xl text-xs transition shadow-md shadow-emerald-950">
-            Claim Shift (Submit to Manager)
-          </button>
-        </div>
-      `).join('');
-      lucide.createIcons();
     }
 
     async function postShift() {
+      if (!client) return alert('Database connection not established.');
       const locId = document.getElementById('postLocation').value;
       const date = document.getElementById('postDate').value;
       const block = document.getElementById('postBlock').value;
       const notes = document.getElementById('postNotes').value;
 
-      if (!date) return alert('Please pick a shift date');
+      if (!locId) return alert('Please select a store location.');
+      if (!date) return alert('Please pick a shift date.');
 
       const startHour = block === 'AM' ? 9 : (block === 'MID' ? 12 : 15);
       const endHour = startHour + 6;
@@ -228,6 +277,7 @@
     }
 
     async function claimShift(shiftId) {
+      if (!client) return alert('Database connection not established.');
       const { error } = await client.from('shifts').update({ status: 'swap_pending' }).eq('id', shiftId);
       if (error) {
         alert(error.message);
@@ -238,6 +288,7 @@
     }
 
     async function saveNewStore() {
+      if (!client) return alert('Database connection not established.');
       const name = document.getElementById('newStoreName').value;
       const storeNum = document.getElementById('newStoreNumber').value;
       const address = document.getElementById('newStoreAddress').value;
@@ -263,19 +314,8 @@
       }
     }
 
-    // THE TAB SWITCHER: Correctly adds onclick behavior
-    function switchTab(tab) {
-      // Hide all content panels and set buttons to "inactive"
-      ['open', 'post', 'stores'].forEach(t => {
-        document.getElementById(`view-${t}`).classList.add('hidden');
-        document.getElementById(`tab-${t}`).className = 'flex-1 py-2 text-xs font-bold rounded-lg text-gray-400 transition';
-      });
-      // Show the selected content panel and set button to "active"
-      document.getElementById(`view-${tab}`).classList.remove('hidden');
-      document.getElementById(`tab-${tab}`).className = 'flex-1 py-2 text-xs font-bold rounded-lg bg-emerald-500 text-black transition shadow-sm';
-    }
-
-    init();
+    // Direct startup execution
+    window.onload = init;
   </script>
 </body>
 </html>
